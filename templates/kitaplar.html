@@ -1,0 +1,345 @@
+<!-- Kütüphane Yönetim Sistemi - Kitap Yönetimi Sayfası -->
+<!-- Kitap ekleme, düzenleme, silme ve listeleme -->
+<!-- CRUD işlemleri ve modal formlar -->
+
+{% extends "base.html" %}
+
+{% block title %}Kitaplar - Kütüphane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-book"></i> Kitap Yönetimi</h2>
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" id="kitapArama" placeholder="Kitap ara...">
+            <button class="btn btn-outline-secondary" type="button" id="kitapAramaBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kitapModal">
+            <i class="fas fa-plus"></i> Yeni Kitap Ekle
+        </button>
+    </div>
+</div>
+
+<!-- Kitap Listesi -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="kitaplarTablosu">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Başlık</th>
+                        <th>Yazar</th>
+                        <th>Yayın Evi</th>
+                        <th>Yayın Yılı</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="kitaplarTbody">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Kitap Ekleme/Düzenleme Modal -->
+<div class="modal fade" id="kitapModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kitapModalTitle">Yeni Kitap Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="kitapForm">
+                <div class="modal-body">
+                    <input type="hidden" id="kitapId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="baslik" class="form-label">Başlık *</label>
+                            <input type="text" class="form-control" id="baslik" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="yazar" class="form-label">Yazar *</label>
+                            <input type="text" class="form-control" id="yazar" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="yayin_evi" class="form-label">Yayın Evi</label>
+                            <input type="text" class="form-control" id="yayin_evi">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="yayin_yili" class="form-label">Yayın Yılı</label>
+                            <input type="number" class="form-control" id="yayin_yili">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="isbn" class="form-label">ISBN</label>
+                            <input type="text" class="form-control" id="isbn">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sayfa_sayisi" class="form-label">Sayfa Sayısı</label>
+                            <input type="number" class="form-control" id="sayfa_sayisi">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="aciklama" class="form-label">Açıklama</label>
+                        <textarea class="form-control" id="aciklama" rows="3"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="kiralanabilir" checked>
+                        <label class="form-check-label" for="kiralanabilir">
+                            Kiralanabilir
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Silme Onay Modal -->
+<div class="modal fade" id="silmeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kitap Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bu kitabı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="silmeOnay">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let silinecekKitapId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadKitaplar();
+    
+    // Form submit
+    document.getElementById('kitapForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveKitap();
+    });
+    
+    // Silme onay
+    document.getElementById('silmeOnay').addEventListener('click', function() {
+        if (silinecekKitapId) {
+            deleteKitap(silinecekKitapId);
+        }
+    });
+    
+    // Arama fonksiyonları
+    document.getElementById('kitapAramaBtn').addEventListener('click', function() {
+        searchKitaplar();
+    });
+    
+    document.getElementById('kitapArama').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchKitaplar();
+        }
+    });
+    
+    // Gerçek zamanlı arama
+    document.getElementById('kitapArama').addEventListener('input', function() {
+        if (this.value.length > 2 || this.value.length === 0) {
+            searchKitaplar();
+        }
+    });
+});
+
+async function loadKitaplar() {
+    try {
+        const response = await axios.get('/api/kitaplar');
+        const kitaplar = response.data;
+        renderKitaplar(kitaplar);
+    } catch (error) {
+        console.error('Kitaplar yüklenirken hata:', error);
+        document.getElementById('kitaplarTbody').innerHTML = 
+            '<tr><td colspan="7" class="text-center text-danger">Kitaplar yüklenirken hata oluştu.</td></tr>';
+    }
+}
+
+function renderKitaplar(kitaplar) {
+    const tbody = document.getElementById('kitaplarTbody');
+    if (kitaplar.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Henüz kitap eklenmemiş.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = kitaplar.map(kitap => `
+        <tr>
+            <td>${kitap.id}</td>
+            <td>${kitap.baslik}</td>
+            <td>${kitap.yazar}</td>
+            <td>${kitap.yayin_evi || '-'}</td>
+            <td>${kitap.yayin_yili || '-'}</td>
+            <td>
+                <span class="badge ${kitap.kiralanabilir ? 'bg-success' : 'bg-warning'}">
+                    ${kitap.kiralanabilir ? 'Müsait' : 'Kiralanmış'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="editKitap(${kitap.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete(${kitap.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function searchKitaplar() {
+    const aramaMetni = document.getElementById('kitapArama').value.toLowerCase();
+    
+    // Tüm kitapları al ve filtrele
+    const tbody = document.getElementById('kitaplarTbody');
+    const satirlar = tbody.querySelectorAll('tr');
+    
+    satirlar.forEach(satir => {
+        const metin = satir.textContent.toLowerCase();
+        if (metin.includes(aramaMetni)) {
+            satir.style.display = '';
+        } else {
+            satir.style.display = 'none';
+        }
+    });
+}
+
+async function saveKitap() {
+    const formData = {
+        baslik: document.getElementById('baslik').value,
+        yazar: document.getElementById('yazar').value,
+        yayin_evi: document.getElementById('yayin_evi').value,
+        yayin_yili: document.getElementById('yayin_yili').value ? parseInt(document.getElementById('yayin_yili').value) : null,
+        isbn: document.getElementById('isbn').value,
+        sayfa_sayisi: document.getElementById('sayfa_sayisi').value ? parseInt(document.getElementById('sayfa_sayisi').value) : null,
+        aciklama: document.getElementById('aciklama').value,
+        kiralanabilir: document.getElementById('kiralanabilir').checked
+    };
+    
+    const kitapId = document.getElementById('kitapId').value;
+    
+    try {
+        if (kitapId) {
+            // Güncelle
+            await axios.put(`/api/kitaplar/${kitapId}`, formData);
+            showAlert('Kitap başarıyla güncellendi!', 'success');
+        } else {
+            // Yeni ekle
+            await axios.post('/api/kitaplar', formData);
+            showAlert('Kitap başarıyla eklendi!', 'success');
+        }
+        
+        // Modal'ı kapat ve formu temizle
+        const modal = bootstrap.Modal.getInstance(document.getElementById('kitapModal'));
+        modal.hide();
+        document.getElementById('kitapForm').reset();
+        document.getElementById('kitapId').value = '';
+        
+        // Listeyi yenile
+        loadKitaplar();
+    } catch (error) {
+        console.error('Kitap kaydedilirken hata:', error);
+        showAlert('Kitap kaydedilirken hata oluştu!', 'danger');
+    }
+}
+
+async function editKitap(id) {
+    try {
+        const response = await axios.get(`/api/kitaplar/${id}`);
+        const kitap = response.data;
+        
+        // Form alanlarını doldur
+        document.getElementById('kitapId').value = kitap.id;
+        document.getElementById('baslik').value = kitap.baslik;
+        document.getElementById('yazar').value = kitap.yazar;
+        document.getElementById('yayin_evi').value = kitap.yayin_evi || '';
+        document.getElementById('yayin_yili').value = kitap.yayin_yili || '';
+        document.getElementById('isbn').value = kitap.isbn || '';
+        document.getElementById('sayfa_sayisi').value = kitap.sayfa_sayisi || '';
+        document.getElementById('aciklama').value = kitap.aciklama || '';
+        document.getElementById('kiralanabilir').checked = kitap.kiralanabilir;
+        
+        // Modal başlığını güncelle
+        document.getElementById('kitapModalTitle').textContent = 'Kitap Düzenle';
+        
+        // Modal'ı aç
+        const modal = new bootstrap.Modal(document.getElementById('kitapModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Kitap bilgileri yüklenirken hata:', error);
+        showAlert('Kitap bilgileri yüklenirken hata oluştu!', 'danger');
+    }
+}
+
+function confirmDelete(id) {
+    silinecekKitapId = id;
+    const modal = new bootstrap.Modal(document.getElementById('silmeModal'));
+    modal.show();
+}
+
+async function deleteKitap(id) {
+    try {
+        await axios.delete(`/api/kitaplar/${id}`);
+        showAlert('Kitap başarıyla silindi!', 'success');
+        
+        // Modal'ı kapat
+        const modal = bootstrap.Modal.getInstance(document.getElementById('silmeModal'));
+        modal.hide();
+        
+        // Listeyi yenile
+        loadKitaplar();
+    } catch (error) {
+        console.error('Kitap silinirken hata:', error);
+        showAlert('Kitap silinirken hata oluştu!', 'danger');
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // 3 saniye sonra otomatik kapat
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

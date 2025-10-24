@@ -1,0 +1,14 @@
+# Kütüphane Yönetim Sistemi - Python Bağımlılıkları
+# Web uygulaması için gerekli Python paketleri
+# FastAPI, veritabanı, şablon motoru ve statik dosya desteği
+
+fastapi          # Modern web framework
+uvicorn          # ASGI server
+sqlalchemy       # ORM (Object-Relational Mapping)
+pydantic         # Veri doğrulama
+python-multipart # Form verisi desteği
+jinja2           # HTML şablon motoru
+aiofiles         # Asenkron dosya işlemleri
+redis            # Caching sistemi
+slowapi          # Rate limiting
+structlog        # Gelişmiş logging

@@ -1,0 +1,516 @@
+<!-- Kütüphane Yönetim Sistemi - Ana Sayfa -->
+<!-- Dashboard ve istatistikler -->
+<!-- Sistem özeti, hızlı erişim ve son eklenen kitaplar -->
+
+{% extends "base.html" %}
+
+{% block title %}Ana Sayfa - Kütüphane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="hero-section text-white rounded-4 p-5 mb-4 shadow-lg" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 50%, #9b59b6 100%);">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-3 fw-bold mb-3">
+                        <i class="fas fa-book-open text-warning me-3"></i>Kütüphane Yönetim Sistemi
+                    </h1>
+                    <p class="lead fs-4 mb-3 text-light">Modern ve kullanıcı dostu kütüphane yönetim çözümü</p>
+                    <p class="fs-5 mb-4 text-white-50">Kitapları yönetin, üyeleri takip edin ve kiralama işlemlerini kolayca gerçekleştirin.</p>
+                    <div class="d-flex gap-3">
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                            <i class="fas fa-check me-1"></i>Kolay Kullanım
+                        </span>
+                        <span class="badge bg-info text-white fs-6 px-3 py-2">
+                            <i class="fas fa-mobile-alt me-1"></i>Responsive
+                        </span>
+                        <span class="badge bg-success fs-6 px-3 py-2">
+                            <i class="fas fa-shield-alt me-1"></i>Güvenli
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="hero-icon">
+                        <i class="fas fa-book-reader" style="font-size: 8rem; color: rgba(255,255,255,0.2);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- İstatistik Kartları -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-white h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="card-title fw-bold mb-1" id="toplam-kitap">-</h2>
+                        <p class="card-text mb-0 text-white-75">Toplam Kitap</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-book fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card text-white h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="card-title fw-bold mb-1" id="toplam-uye">-</h2>
+                        <p class="card-text mb-0 text-white-75">Toplam Üye</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card text-white h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="card-title fw-bold mb-1" id="aktif-kiralama">-</h2>
+                        <p class="card-text mb-0 text-white-75">Aktif Kiralama</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-exchange-alt fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card text-white h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="card-title fw-bold mb-1" id="kiralanabilir-kitap">-</h2>
+                        <p class="card-text mb-0 text-white-75">Kiralanabilir Kitap</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-bookmark fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Hızlı Erişim -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h5 class="card-title mb-0 text-dark fw-bold">
+                    <i class="fas fa-bolt text-warning me-2"></i>Hızlı İşlemler
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="/kitaplar" class="btn btn-lg btn-outline-primary border-2 rounded-pill fw-semibold">
+                        <i class="fas fa-book me-2"></i>Kitap Ekle
+                    </a>
+                    <a href="/uyeler" class="btn btn-lg btn-outline-success border-2 rounded-pill fw-semibold">
+                        <i class="fas fa-user-plus me-2"></i>Üye Ekle
+                    </a>
+                    <a href="/kiralamalar" class="btn btn-lg btn-outline-warning border-2 rounded-pill fw-semibold">
+                        <i class="fas fa-hand-holding me-2"></i>Kitap Kirala
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Son Eklenen Kitaplar -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h5 class="card-title mb-0 text-dark fw-bold">
+                    <i class="fas fa-clock text-info me-2"></i>Son Eklenen Kitaplar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="son-kitaplar">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafikler ve Raporlar -->
+<div class="row">
+    <!-- Kiralama Trendi -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h5 class="card-title mb-0 text-dark fw-bold">
+                    <i class="fas fa-chart-line text-success me-2"></i>Kiralama Trendi
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="kiralamaTrendi" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kitap Kategorileri -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h5 class="card-title mb-0 text-dark fw-bold">
+                    <i class="fas fa-chart-pie text-warning me-2"></i>Kitap Durumları
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="kitapDurumlari" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detaylı İstatistikler -->
+<div class="row">
+    <!-- En Popüler Kitaplar -->
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h5 class="card-title mb-0 text-dark fw-bold">
+                    <i class="fas fa-trophy text-warning me-2"></i>En Popüler Kitaplar
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="populerKitaplar" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aylık Rapor -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h5 class="card-title mb-0 text-dark fw-bold">
+                    <i class="fas fa-calendar-alt text-info me-2"></i>Bu Ay
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="aylik-rapor">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // İstatistikleri yükle
+    loadStatistics();
+    loadRecentBooks();
+    loadCharts();
+    loadMonthlyReport();
+});
+
+async function loadStatistics() {
+    try {
+        const [kitaplar, uyeler, kiralamalar] = await Promise.all([
+            axios.get('/api/kitaplar'),
+            axios.get('/api/uyeler'),
+            axios.get('/api/kiralamalar')
+        ]);
+
+        document.getElementById('toplam-kitap').textContent = kitaplar.data.length;
+        document.getElementById('toplam-uye').textContent = uyeler.data.length;
+        
+        const aktifKiralamalar = kiralamalar.data.filter(k => k.durum === 'aktif');
+        document.getElementById('aktif-kiralama').textContent = aktifKiralamalar.length;
+        
+        const kiralanabilirKitaplar = kitaplar.data.filter(k => k.kiralanabilir);
+        document.getElementById('kiralanabilir-kitap').textContent = kiralanabilirKitaplar.length;
+    } catch (error) {
+        console.error('İstatistikler yüklenirken hata:', error);
+    }
+}
+
+async function loadRecentBooks() {
+    try {
+        const response = await axios.get('/api/kitaplar');
+        const kitaplar = response.data.slice(-5).reverse(); // Son 5 kitap
+        
+        const container = document.getElementById('son-kitaplar');
+        if (kitaplar.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz kitap eklenmemiş.</p>';
+            return;
+        }
+        
+        container.innerHTML = kitaplar.map(kitap => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <strong>${kitap.baslik}</strong><br>
+                    <small class="text-muted">${kitap.yazar}</small>
+                </div>
+                <span class="badge ${kitap.kiralanabilir ? 'bg-success' : 'bg-warning'}">
+                    ${kitap.kiralanabilir ? 'Müsait' : 'Kiralanmış'}
+                </span>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Son kitaplar yüklenirken hata:', error);
+        document.getElementById('son-kitaplar').innerHTML = '<p class="text-danger">Kitaplar yüklenirken hata oluştu.</p>';
+    }
+}
+
+// Grafik fonksiyonları
+async function loadCharts() {
+    try {
+        const [kitaplar, kiralamalar] = await Promise.all([
+            axios.get('/api/kitaplar'),
+            axios.get('/api/kiralamalar')
+        ]);
+        
+        // Kiralama trendi grafiği
+        createKiralamaTrendi(kiralamalar.data);
+        
+        // Kitap durumları pasta grafiği
+        createKitapDurumlari(kitaplar.data);
+        
+        // En popüler kitaplar grafiği
+        createPopulerKitaplar(kiralamalar.data);
+        
+    } catch (error) {
+        console.error('Grafikler yüklenirken hata:', error);
+    }
+}
+
+function createKiralamaTrendi(kiralamalar) {
+    const ctx = document.getElementById('kiralamaTrendi').getContext('2d');
+    
+    // Son 7 günün verilerini hazırla
+    const son7Gun = [];
+    const kiralamaSayilari = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const tarih = new Date();
+        tarih.setDate(tarih.getDate() - i);
+        const tarihStr = tarih.toISOString().split('T')[0];
+        
+        son7Gun.push(tarih.toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }));
+        
+        const oGunKiralamalar = kiralamalar.filter(k => 
+            k.kiralama_tarihi.startsWith(tarihStr)
+        ).length;
+        
+        kiralamaSayilari.push(oGunKiralamalar);
+    }
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: son7Gun,
+            datasets: [{
+                label: 'Kiralama Sayısı',
+                data: kiralamaSayilari,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createKitapDurumlari(kitaplar) {
+    const ctx = document.getElementById('kitapDurumlari').getContext('2d');
+    
+    const kiralanabilir = kitaplar.filter(k => k.kiralanabilir).length;
+    const kiralanmis = kitaplar.filter(k => !k.kiralanabilir).length;
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Kiralanabilir', 'Kiralanmış'],
+            datasets: [{
+                data: [kiralanabilir, kiralanmis],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function createPopulerKitaplar(kiralamalar) {
+    const ctx = document.getElementById('populerKitaplar').getContext('2d');
+    
+    // Kitap kiralama sayılarını hesapla
+    const kitapKiralamaSayilari = {};
+    
+    kiralamalar.forEach(kiralama => {
+        const kitapAdi = kiralama.kitap.baslik;
+        kitapKiralamaSayilari[kitapAdi] = (kitapKiralamaSayilari[kitapAdi] || 0) + 1;
+    });
+    
+    // En çok kiralanan 5 kitabı al
+    const enPopuler = Object.entries(kitapKiralamaSayilari)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5);
+    
+    const kitapAdlari = enPopuler.map(([kitap]) => kitap.length > 20 ? kitap.substring(0, 20) + '...' : kitap);
+    const kiralamaSayilari = enPopuler.map(([,sayi]) => sayi);
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: kitapAdlari,
+            datasets: [{
+                label: 'Kiralama Sayısı',
+                data: kiralamaSayilari,
+                backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+async function loadMonthlyReport() {
+    try {
+        const [kitaplar, uyeler, kiralamalar] = await Promise.all([
+            axios.get('/api/kitaplar'),
+            axios.get('/api/uyeler'),
+            axios.get('/api/kiralamalar')
+        ]);
+        
+        const buAy = new Date().getMonth();
+        const buYil = new Date().getFullYear();
+        
+        // Bu ay eklenen kitaplar
+        const buAyEklenenKitaplar = kitaplar.data.filter(kitap => {
+            const kitapTarihi = new Date(kitap.olusturma_tarihi);
+            return kitapTarihi.getMonth() === buAy && kitapTarihi.getFullYear() === buYil;
+        }).length;
+        
+        // Bu ay eklenen üyeler
+        const buAyEklenenUyeler = uyeler.data.filter(uye => {
+            const uyeTarihi = new Date(uye.uyelik_tarihi);
+            return uyeTarihi.getMonth() === buAy && uyeTarihi.getFullYear() === buYil;
+        }).length;
+        
+        // Bu ay yapılan kiralamalar
+        const buAyKiralamalar = kiralamalar.data.filter(kiralama => {
+            const kiralamaTarihi = new Date(kiralama.kiralama_tarihi);
+            return kiralamaTarihi.getMonth() === buAy && kiralamaTarihi.getFullYear() === buYil;
+        }).length;
+        
+        // Bu ay teslim edilen kiralamalar
+        const buAyTeslimler = kiralamalar.data.filter(kiralama => {
+            if (!kiralama.teslim_tarihi) return false;
+            const teslimTarihi = new Date(kiralama.teslim_tarihi);
+            return teslimTarihi.getMonth() === buAy && teslimTarihi.getFullYear() === buYil;
+        }).length;
+        
+        document.getElementById('aylik-rapor').innerHTML = `
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="text-center p-3 bg-primary bg-opacity-10 rounded-3">
+                        <h4 class="text-primary mb-1">${buAyEklenenKitaplar}</h4>
+                        <small class="text-muted">Yeni Kitap</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-center p-3 bg-success bg-opacity-10 rounded-3">
+                        <h4 class="text-success mb-1">${buAyEklenenUyeler}</h4>
+                        <small class="text-muted">Yeni Üye</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-center p-3 bg-warning bg-opacity-10 rounded-3">
+                        <h4 class="text-warning mb-1">${buAyKiralamalar}</h4>
+                        <small class="text-muted">Kiralama</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-center p-3 bg-info bg-opacity-10 rounded-3">
+                        <h4 class="text-info mb-1">${buAyTeslimler}</h4>
+                        <small class="text-muted">Teslim</small>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Aylık rapor yüklenirken hata:', error);
+        document.getElementById('aylik-rapor').innerHTML = '<p class="text-danger">Rapor yüklenirken hata oluştu.</p>';
+    }
+}
+</script>
+{% endblock %}

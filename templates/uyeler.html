@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Üyeler - Kütüphane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users"></i> Üye Yönetimi</h2>
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" id="uyeArama" placeholder="Üye ara...">
+            <button class="btn btn-outline-secondary" type="button" id="uyeAramaBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uyeModal">
+            <i class="fas fa-plus"></i> Yeni Üye Ekle
+        </button>
+    </div>
+</div>
+
+<!-- Üye Listesi -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="uyelerTablosu">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Ad Soyad</th>
+                        <th>E-posta</th>
+                        <th>Telefon</th>
+                        <th>Üyelik Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="uyelerTbody">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Üye Ekleme/Düzenleme Modal -->
+<div class="modal fade" id="uyeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uyeModalTitle">Yeni Üye Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="uyeForm">
+                <div class="modal-body">
+                    <input type="hidden" id="uyeId">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ad" class="form-label">Ad *</label>
+                            <input type="text" class="form-control" id="ad" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="soyad" class="form-label">Soyad *</label>
+                            <input type="text" class="form-control" id="soyad" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">E-posta *</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telefon" class="form-label">Telefon</label>
+                            <input type="tel" class="form-control" id="telefon">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adres" class="form-label">Adres</label>
+                        <textarea class="form-control" id="adres" rows="3"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="aktif" checked>
+                        <label class="form-check-label" for="aktif">
+                            Aktif Üye
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Silme Onay Modal -->
+<div class="modal fade" id="silmeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Üye Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bu üyeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="silmeOnay">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let silinecekUyeId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadUyeler();
+    
+    // Form submit
+    document.getElementById('uyeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveUye();
+    });
+    
+    // Silme onay
+    document.getElementById('silmeOnay').addEventListener('click', function() {
+        if (silinecekUyeId) {
+            deleteUye(silinecekUyeId);
+        }
+    });
+    
+    // Arama fonksiyonları
+    document.getElementById('uyeAramaBtn').addEventListener('click', function() {
+        searchUyeler();
+    });
+    
+    document.getElementById('uyeArama').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchUyeler();
+        }
+    });
+    
+    // Gerçek zamanlı arama
+    document.getElementById('uyeArama').addEventListener('input', function() {
+        if (this.value.length > 2 || this.value.length === 0) {
+            searchUyeler();
+        }
+    });
+});
+
+async function loadUyeler() {
+    try {
+        const response = await axios.get('/api/uyeler');
+        const uyeler = response.data;
+        renderUyeler(uyeler);
+    } catch (error) {
+        console.error('Üyeler yüklenirken hata:', error);
+        document.getElementById('uyelerTbody').innerHTML = 
+            '<tr><td colspan="7" class="text-center text-danger">Üyeler yüklenirken hata oluştu.</td></tr>';
+    }
+}
+
+function renderUyeler(uyeler) {
+    const tbody = document.getElementById('uyelerTbody');
+    if (uyeler.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Henüz üye eklenmemiş.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = uyeler.map(uye => `
+        <tr>
+            <td>${uye.id}</td>
+            <td>${uye.ad} ${uye.soyad}</td>
+            <td>${uye.email}</td>
+            <td>${uye.telefon || '-'}</td>
+            <td>${new Date(uye.uyelik_tarihi).toLocaleDateString('tr-TR')}</td>
+            <td>
+                <span class="badge ${uye.aktif ? 'bg-success' : 'bg-secondary'}">
+                    ${uye.aktif ? 'Aktif' : 'Pasif'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="editUye(${uye.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete(${uye.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function searchUyeler() {
+    const aramaMetni = document.getElementById('uyeArama').value.toLowerCase();
+    
+    // Tüm üyeleri al ve filtrele
+    const tbody = document.getElementById('uyelerTbody');
+    const satirlar = tbody.querySelectorAll('tr');
+    
+    satirlar.forEach(satir => {
+        const metin = satir.textContent.toLowerCase();
+        if (metin.includes(aramaMetni)) {
+            satir.style.display = '';
+        } else {
+            satir.style.display = 'none';
+        }
+    });
+}
+
+async function saveUye() {
+    const formData = {
+        ad: document.getElementById('ad').value,
+        soyad: document.getElementById('soyad').value,
+        email: document.getElementById('email').value,
+        telefon: document.getElementById('telefon').value,
+        adres: document.getElementById('adres').value,
+        aktif: document.getElementById('aktif').checked
+    };
+    
+    const uyeId = document.getElementById('uyeId').value;
+    
+    try {
+        if (uyeId) {
+            // Güncelle
+            await axios.put(`/api/uyeler/${uyeId}`, formData);
+            showAlert('Üye başarıyla güncellendi!', 'success');
+        } else {
+            // Yeni ekle
+            await axios.post('/api/uyeler', formData);
+            showAlert('Üye başarıyla eklendi!', 'success');
+        }
+        
+        // Modal'ı kapat ve formu temizle
+        const modal = bootstrap.Modal.getInstance(document.getElementById('uyeModal'));
+        modal.hide();
+        document.getElementById('uyeForm').reset();
+        document.getElementById('uyeId').value = '';
+        
+        // Listeyi yenile
+        loadUyeler();
+    } catch (error) {
+        console.error('Üye kaydedilirken hata:', error);
+        showAlert('Üye kaydedilirken hata oluştu!', 'danger');
+    }
+}
+
+async function editUye(id) {
+    try {
+        const response = await axios.get(`/api/uyeler/${id}`);
+        const uye = response.data;
+        
+        // Form alanlarını doldur
+        document.getElementById('uyeId').value = uye.id;
+        document.getElementById('ad').value = uye.ad;
+        document.getElementById('soyad').value = uye.soyad;
+        document.getElementById('email').value = uye.email;
+        document.getElementById('telefon').value = uye.telefon || '';
+        document.getElementById('adres').value = uye.adres || '';
+        document.getElementById('aktif').checked = uye.aktif;
+        
+        // Modal başlığını güncelle
+        document.getElementById('uyeModalTitle').textContent = 'Üye Düzenle';
+        
+        // Modal'ı aç
+        const modal = new bootstrap.Modal(document.getElementById('uyeModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Üye bilgileri yüklenirken hata:', error);
+        showAlert('Üye bilgileri yüklenirken hata oluştu!', 'danger');
+    }
+}
+
+function confirmDelete(id) {
+    silinecekUyeId = id;
+    const modal = new bootstrap.Modal(document.getElementById('silmeModal'));
+    modal.show();
+}
+
+async function deleteUye(id) {
+    try {
+        await axios.delete(`/api/uyeler/${id}`);
+        showAlert('Üye başarıyla silindi!', 'success');
+        
+        // Modal'ı kapat
+        const modal = bootstrap.Modal.getInstance(document.getElementById('silmeModal'));
+        modal.hide();
+        
+        // Listeyi yenile
+        loadUyeler();
+    } catch (error) {
+        console.error('Üye silinirken hata:', error);
+        showAlert('Üye silinirken hata oluştu!', 'danger');
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // 3 saniye sonra otomatik kapat
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

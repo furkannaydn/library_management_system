@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Kiralamalar - Kütüphane Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-exchange-alt"></i> Kiralama Yönetimi</h2>
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" id="kiralamaArama" placeholder="Kiralama ara...">
+            <button class="btn btn-outline-secondary" type="button" id="kiralamaAramaBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kiralamaModal">
+            <i class="fas fa-plus"></i> Yeni Kiralama
+        </button>
+    </div>
+</div>
+
+<!-- Kiralama Listesi -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="kiralamalarTablosu">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Kitap</th>
+                        <th>Üye</th>
+                        <th>Kiralama Tarihi</th>
+                        <th>Son Teslim Tarihi</th>
+                        <th>Teslim Tarihi</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="kiralamalarTbody">
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Kiralama Ekleme Modal -->
+<div class="modal fade" id="kiralamaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Kiralama</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="kiralamaForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="kitap_id" class="form-label">Kitap *</label>
+                            <select class="form-select" id="kitap_id" required>
+                                <option value="">Kitap seçin...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="uye_id" class="form-label">Üye *</label>
+                            <select class="form-select" id="uye_id" required>
+                                <option value="">Üye seçin...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="son_teslim_tarihi" class="form-label">Son Teslim Tarihi *</label>
+                            <input type="date" class="form-control" id="son_teslim_tarihi" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="notlar" class="form-label">Notlar</label>
+                            <input type="text" class="form-control" id="notlar">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kirala</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadKiralamalar();
+    loadKitaplar();
+    loadUyeler();
+    
+    // Form submit
+    document.getElementById('kiralamaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveKiralama();
+    });
+    
+    // Bugünün tarihini varsayılan olarak ayarla
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    document.getElementById('son_teslim_tarihi').value = nextWeek.toISOString().split('T')[0];
+    
+    // Arama fonksiyonları
+    document.getElementById('kiralamaAramaBtn').addEventListener('click', function() {
+        searchKiralamalar();
+    });
+    
+    document.getElementById('kiralamaArama').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchKiralamalar();
+        }
+    });
+    
+    // Gerçek zamanlı arama
+    document.getElementById('kiralamaArama').addEventListener('input', function() {
+        if (this.value.length > 2 || this.value.length === 0) {
+            searchKiralamalar();
+        }
+    });
+});
+
+async function loadKiralamalar() {
+    try {
+        const response = await axios.get('/api/kiralamalar');
+        const kiralamalar = response.data;
+        renderKiralamalar(kiralamalar);
+    } catch (error) {
+        console.error('Kiralamalar yüklenirken hata:', error);
+        document.getElementById('kiralamalarTbody').innerHTML = 
+            '<tr><td colspan="8" class="text-center text-danger">Kiralamalar yüklenirken hata oluştu.</td></tr>';
+    }
+}
+
+function renderKiralamalar(kiralamalar) {
+    const tbody = document.getElementById('kiralamalarTbody');
+    if (kiralamalar.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Henüz kiralama yapılmamış.</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = kiralamalar.map(kiralama => `
+        <tr>
+            <td>${kiralama.id}</td>
+            <td>${kiralama.kitap.baslik}</td>
+            <td>${kiralama.uye.ad} ${kiralama.uye.soyad}</td>
+            <td>${new Date(kiralama.kiralama_tarihi).toLocaleDateString('tr-TR')}</td>
+            <td>${new Date(kiralama.son_teslim_tarihi).toLocaleDateString('tr-TR')}</td>
+            <td>${kiralama.teslim_tarihi ? new Date(kiralama.teslim_tarihi).toLocaleDateString('tr-TR') : '-'}</td>
+            <td>
+                <span class="badge ${getStatusBadgeClass(kiralama.durum)}">
+                    ${getStatusText(kiralama.durum)}
+                </span>
+            </td>
+            <td>
+                ${kiralama.durum === 'aktif' ? 
+                    `<button class="btn btn-sm btn-success" onclick="teslimEt(${kiralama.id})">
+                        <i class="fas fa-check"></i> Teslim Et
+                    </button>` : 
+                    '<span class="text-muted">Teslim Edildi</span>'
+                }
+            </td>
+        </tr>
+    `).join('');
+}
+
+function searchKiralamalar() {
+    const aramaMetni = document.getElementById('kiralamaArama').value.toLowerCase();
+    
+    // Tüm kiralamaları al ve filtrele
+    const tbody = document.getElementById('kiralamalarTbody');
+    const satirlar = tbody.querySelectorAll('tr');
+    
+    satirlar.forEach(satir => {
+        const metin = satir.textContent.toLowerCase();
+        if (metin.includes(aramaMetni)) {
+            satir.style.display = '';
+        } else {
+            satir.style.display = 'none';
+        }
+    });
+}
+
+async function loadKitaplar() {
+    try {
+        const response = await axios.get('/api/kitaplar');
+        const kitaplar = response.data.filter(kitap => kitap.kiralanabilir);
+        
+        const select = document.getElementById('kitap_id');
+        select.innerHTML = '<option value="">Kitap seçin...</option>' +
+            kitaplar.map(kitap => `<option value="${kitap.id}">${kitap.baslik} - ${kitap.yazar}</option>`).join('');
+    } catch (error) {
+        console.error('Kitaplar yüklenirken hata:', error);
+    }
+}
+
+async function loadUyeler() {
+    try {
+        const response = await axios.get('/api/uyeler');
+        const uyeler = response.data.filter(uye => uye.aktif);
+        
+        const select = document.getElementById('uye_id');
+        select.innerHTML = '<option value="">Üye seçin...</option>' +
+            uyeler.map(uye => `<option value="${uye.id}">${uye.ad} ${uye.soyad}</option>`).join('');
+    } catch (error) {
+        console.error('Üyeler yüklenirken hata:', error);
+    }
+}
+
+async function saveKiralama() {
+    const formData = {
+        kitap_id: parseInt(document.getElementById('kitap_id').value),
+        uye_id: parseInt(document.getElementById('uye_id').value),
+        son_teslim_tarihi: document.getElementById('son_teslim_tarihi').value,
+        notlar: document.getElementById('notlar').value
+    };
+    
+    try {
+        await axios.post('/api/kiralamalar', formData);
+        showAlert('Kitap başarıyla kiralandı!', 'success');
+        
+        // Modal'ı kapat ve formu temizle
+        const modal = bootstrap.Modal.getInstance(document.getElementById('kiralamaModal'));
+        modal.hide();
+        document.getElementById('kiralamaForm').reset();
+        
+        // Listeleri yenile
+        loadKiralamalar();
+        loadKitaplar();
+    } catch (error) {
+        console.error('Kiralama yapılırken hata:', error);
+        showAlert('Kiralama yapılırken hata oluştu!', 'danger');
+    }
+}
+
+async function teslimEt(id) {
+    try {
+        await axios.put(`/api/kiralamalar/${id}/teslim`);
+        showAlert('Kitap başarıyla teslim edildi!', 'success');
+        
+        // Listeleri yenile
+        loadKiralamalar();
+        loadKitaplar();
+    } catch (error) {
+        console.error('Teslim işlemi sırasında hata:', error);
+        showAlert('Teslim işlemi sırasında hata oluştu!', 'danger');
+    }
+}
+
+function getStatusBadgeClass(durum) {
+    switch(durum) {
+        case 'aktif': return 'bg-primary';
+        case 'teslim_edildi': return 'bg-success';
+        case 'gecikmis': return 'bg-danger';
+        default: return 'bg-secondary';
+    }
+}
+
+function getStatusText(durum) {
+    switch(durum) {
+        case 'aktif': return 'Aktif';
+        case 'teslim_edildi': return 'Teslim Edildi';
+        case 'gecikmis': return 'Gecikmiş';
+        default: return 'Bilinmiyor';
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // 3 saniye sonra otomatik kapat
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

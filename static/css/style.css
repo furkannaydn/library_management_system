@@ -1,0 +1,399 @@
+/* Kütüphane Yönetim Sistemi - Modern CSS Stilleri */
+/* Responsive tasarım, gradient renkler ve modern UI bileşenleri */
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #ffd700 !important;
+    transform: scale(1.05);
+}
+
+/* Hero Section - Ana başlık bölümü */
+.hero-section {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 50%, #9b59b6 100%);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+/* Modern Kart Tasarımı */
+.card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* İstatistik Kartları */
+.stat-icon {
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.card:hover .stat-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead th {
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0,123,255,0.1);
+}
+
+/* Modern Buton Tasarımı */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.btn-lg {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+}
+
+/* Rounded Pill Butonlar */
+.btn.rounded-pill {
+    border-radius: 50px;
+    padding: 12px 30px;
+}
+
+/* Tema Seçenekleri */
+.dropdown-item.active {
+    background-color: #007bff;
+    color: white;
+}
+
+[data-theme="dark"] .dropdown-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Tema geçiş animasyonu */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.table {
+    transition: color 0.3s ease;
+}
+
+.form-control, .form-select {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 15px 15px 0 0;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5em 0.75em;
+    border-radius: 6px;
+}
+
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Özel animasyonlar */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive tasarım */
+@media (max-width: 768px) {
+    .jumbotron {
+        padding: 2rem 1rem;
+    }
+    
+    .jumbotron h1 {
+        font-size: 2rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Dark Mode Stilleri */
+[data-theme="dark"] {
+    --bs-body-bg: #1a1a1a;
+    --bs-body-color: #ffffff;
+    --bs-card-bg: #2d2d2d;
+    --bs-border-color: #495057;
+    --bs-secondary-bg: #343a40;
+}
+
+[data-theme="dark"] body {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .card {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    border: 1px solid #495057 !important;
+}
+
+[data-theme="dark"] .card-header {
+    background-color: #343a40 !important;
+    border-bottom: 1px solid #495057 !important;
+}
+
+[data-theme="dark"] .card-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+    border-color: #495057 !important;
+}
+
+[data-theme="dark"] .table tbody tr {
+    border-color: #495057 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+}
+
+[data-theme="dark"] .table tbody td {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-control, 
+[data-theme="dark"] .form-select {
+    background-color: #2d2d2d !important;
+    border-color: #495057 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .form-control:focus, 
+[data-theme="dark"] .form-select:focus {
+    background-color: #2d2d2d !important;
+    border-color: #007bff !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25) !important;
+}
+
+[data-theme="dark"] .form-label {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    border: 1px solid #495057 !important;
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: #495057 !important;
+    background-color: #343a40 !important;
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top-color: #495057 !important;
+    background-color: #343a40 !important;
+}
+
+[data-theme="dark"] .modal-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: #2d2d2d !important;
+    border: 1px solid #495057 !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #495057 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #adb5bd !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Auto tema - sistem tercihini takip et */
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] {
+        --bs-body-bg: #1a1a1a;
+        --bs-body-color: #ffffff;
+        --bs-card-bg: #2d2d2d;
+        --bs-border-color: #495057;
+        --bs-secondary-bg: #343a40;
+    }
+    
+    [data-theme="auto"] body {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: #ffffff;
+    }
+    
+    [data-theme="auto"] .card {
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border: 1px solid #495057;
+    }
+}
+
+/* Özel scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading animasyonu */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
