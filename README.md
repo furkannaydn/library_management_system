@@ -8,19 +8,19 @@ Kitapları yönetin, üyeleri takip edin ve kiralama işlemlerini kolayca gerçe
 ## 🖼️ Proje Görselleri
 
 ### 🏠 Ana Sayfa
-![Ana Sayfa]("C:\Users\furkan\Desktop\library_management_system\images\anaekran.png")
+![Ana Sayfa](images/anaekran.png)
 
 ### 📖 Kitap Yönetimi Sayfası
-![Kitap Yönetimi]("C:\Users\furkan\Desktop\library_management_system\images\kitaplar.png")
+![Kitap Yönetimi](images/kitaplar.png)
 
 ### 👥 Üye Yönetimi Sayfası
-![Üye Yönetimi]("C:\Users\furkan\Desktop\library_management_system\images\üyeler.png")
+![Üye Yönetimi](images/uyeler.png)
 
 ### 🔄 Kiralama Sayfası
-![Kiralama Ekranı]("C:\Users\furkan\Desktop\library_management_system\images\kiralama.png")
+![Kiralama Ekranı](images/kiralama.png)
 
 > Görseller `images/` klasöründe bulunmalıdır.  
-> Örnek: `library/images/home.png`
+> Örnek: `library/images/anaekran.png`
 
 ---
 
